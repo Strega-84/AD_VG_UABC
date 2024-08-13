@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8">
+    <title>VG and mental health</title>
+    <script src="jspsych/jspsych.js"></script>
+    <script src="https://unpkg.com/@jspsych-contrib/plugin-pipe"></script>
+    <script src="jspsych/plugin-html-button-response.js"></script>
+    <script src="jspsych/plugin-survey-text.js"></script>
+    <script src="jspsych/plugin-html-keyboard-response.js"></script>
+    <script src="jspsych/plugin-survey-html-form.js"></script>
+    <script src="jspsych/plugin-survey-multi-choice.js"></script>
+    <script src="jspsych/plugin-html-slider-response.js"></script>
+    <script src="jspsych/plugin-survey-likert.js"></script>
+    <script src="jspsych/plugin-survey-multi-choice.js"></script>
+    <script src="jspsych/plugin-fullscreen.js"></script>
+    <script src="jspsych/plugin-instructions.js"></script>
+    <script src="jspsych/stimuli.js"></script>
+    <script src="jspsych/plugin-survey-multi-select.js"></script>
+    <script src="jspsych/plugin-preload.js"></script>
+    <link href="jspsych/jspsych.css" rel="stylesheet" type="text/css"/>
+  </head>
+  <body></body>
+  <script>
+  
+  window.addEventListener('beforeunload', (event) => {
+    // Cancel the event as stated by the standard.
+        event.preventDefault();
+    // Chrome requires returnValue to be set.
+        event.returnValue = '';
+    });
+  
+ 
+    // initialize jsPsych
+    var jsPsych = initJsPsych({
+        show_progress_bar: true
+        }
+    );    
+    
+    const start_time = Date.now();
+    jsPsych.data.addProperties({Date: start_time});
+
+    // create timeline 
+    var timeline = [];
+
+    // Subject ID
+    
+    const subject_id = jsPsych.randomization.randomID(10);
+    //const filename = filename; 
+    jsPsych.data.addProperties({ID: subject_id});
+
+    timeline.push({
+        type: jsPsychFullscreen,
+        fullscreen_mode: true,
+        message: '<p style= "font-size:30px;"><strong>¡Bienvenido!</strong></p><p style= "font-size:20px;"></p>Los responsables de esta investigación<p><strong>¡AGRADECEN TU PARTICIPACIÓN!</strong> </p> Dr. Julio César Llamas Alonso (Universidad La Salle Bajío) <br>Dr. Luis Ángel Llamas Alonso (Universidad Autónoma de Baja California) <br>Dr. Salvador Trejo Garcia (Universidad Autónoma de Baja California)</p>',
+        button_label: "Comenzar"
+    });
+
+    var consent = {
+        type: jsPsychHtmlButtonResponse,
+        stimulus: '<p style="font-size:20px;"><strong>CONSENTIMIENTO INFORMADO</strong></p>' + '<div style="text-align: justify;">'+
+              '<p>Usted ha sido invitado a participar en el presente proyecto de investigación, el cual es desarrollado por investigadores de la Universidad Autónoma de Baja California. <br>El propósito del presente estudio es ver cómo la práctica de videojuegos se relaciona con distintos patrones conductuales asociados con depresión, ansiedad y déficit de atención, en adultos con distintas edades y niveles educativos. Para participar es importante que seas mayor de 18 años. Deberá aceptar participar si entiende y está de acuerdo con lo que implica el estudio.</p>' +
+              '<p>Su participación tendrá una duración aproximada de 30 minutos. Si no tienes tiempo ahora, deja esta pestaña abierta o ingresa luego. <br> Tu participación consistirá en contestar cuatro cuestionarios: uno demográfico, uno de prácticas de videojuegos, uno de ansiedad, uno de impulsividad y otro de habilidades atencionales.</p>' +
+              '<p>Al aceptar mi participación soy consciente de que:</p>' +
+              '<ul><li>Este estudio no prevé repercusiones físicas, ni psicológicas.</li>' +
+              '<li>Los datos obtenidos serán usados sólo para fines de investigación.</li></ul>' +
+              '<p>Manifiesto mi libre decisión, consciente y voluntaria de aceptar participar en esta investigación.</p>',
+        choices: ['<strong>Acepto</strong>', 'No acepto'],
+        on_finish: function() {
+            var data = jsPsych.data.get().last(1).values()[0];
+            if(data.response== 1){
+                jsPsych.endExperiment('El experimento finalizó porque no aceptó los términos de participación. Puede cerrar el navegador.');
+            }
+      },
+      data:{stimulus:"Informed consent"}
+    }
+
+    timeline.push(consent); 
+
+    var email = {
+  type: jsPsychSurveyText,
+  preamble: 'Si gustas recibir tus resultados interpretados con su grupo de referencia anota tu correo y solicitalos al correo: strejo@uabc.edu.mx:',
+  questions: [
+    {prompt: 'Correo electrónico'}
+    ]
+    }
+
+    timeline.push(email);
+    
+    var birthdate = {
+        type: jsPsychSurveyHtmlForm,
+        preamble: 'Fecha de nacimiento:',
+        html: '<p><input type="date" id="dob_1" name="dob_2" value="2000-02-29" required></p>',
+        button_label: "Continuar",
+        required: true,
+        data:{stimulus: "Birthday"} 
+        
+    }
+
+    timeline.push(birthdate); 
+
+    var demo_sex1 = {
+        type: jsPsychSurveyMultiChoice,
+        questions: [{
+            prompt: "Sexo biológico:", 
+            name: 'Sex1', 
+            options: ['Hombre', 'Mujer', 'Prefiero no decirlo'], 
+            required: true
+        }],
+        button_label: "Continuar",
+        data:{stimulus:"Sex1"}
+    }
+
+    timeline.push(demo_sex1); 
+    
+    var demo_sex2 = {
+        type: jsPsychSurveyMultiChoice,
+        questions: [{
+            prompt: "Género de identidad:", 
+            name: 'Sex2', 
+            options: ['Hombre', 'Mujer', 'No binario', 'Prefiero no decirlo'], 
+            required: true
+        }],
+        button_label: "Continuar",
+        data:{stimulus:"Sex2"}
+    }
+
+    timeline.push(demo_sex2);
+
+     var demo_sex3 = {
+        type: jsPsychSurveyMultiChoice,
+        questions: [{
+            prompt: "Preferencia sexual:", 
+            name: 'Sex3', 
+            options: ['Hombre', 'Mujer', 'Ambos', 'Ninguno', 'Prefiero no decirlo'], 
+            required: true
+        }],
+        button_label: "Continuar",
+        data:{stimulus:"Sex3"}
+    }
+
+    timeline.push(demo_sex3);
+
+     var esco_1 = {
+        type: jsPsychSurveyMultiChoice,
+        questions: [{
+            prompt: "Indica tu máximo grado de estudios alcanzado (títulado):", 
+            name: 'esco_1', 
+            options: ['Primaria', 'Secundaria', 'Preparatoria', 'Universidad', 'Posgrado'], 
+            required: true
+        }],
+        button_label: "Continuar",
+        data:{stimulus:"Sex3"}
+    }
+
+    timeline.push(esco_1);
+
+    var esco_2 = {
+  type: jsPsychSurveyText,
+  preamble: 'Anota tu escolaridad en número de años (ejemplo: si cuentas con primaria concluida escribe 6, si cuentas con secundaria escribe 9.)',
+  questions: [
+    {prompt: 'Número de años de estudio'}
+    
+    ],
+    required: true
+    }
+
+    timeline.push(esco_2);  
+    
+    var pais = {
+  type: jsPsychSurveyText,
+  preamble: 'Anota tu país de procedencia',
+  questions: [
+    {prompt: 'País de procedencia'}
+    
+    ],
+    required: true
+    }
+
+    timeline.push(pais);  
+    
+    var ses = {
+        type: jsPsychSurveyMultiChoice,
+        questions: [
+            {
+            prompt: "Pensando en el jefe o jefa de hogar, ¿cuál fue el último año de estudios que aprobó en la escuela? Si tú eres el jefé o jefa de hogar, repite tu escolaridad", 
+            name: 'socio_esco', 
+            options: ['No estudio',
+                    'Primaria Incompleta', 
+                    'Primaria Incompleta', 
+                    'Primaria Completa', 
+                    'Secundaria Incompleta',
+                    'Secundaria Completa',
+                    'Carrera comercial',
+                    'Carrera técnica',
+                    'Preparatoria Incompleta',
+                    'Preparatoria Completa',
+                    'Licenciatura Incompleta',
+                    'Licenciatura Completa',
+                    'Diplomado o maestría',
+                    'Doctorado'
+                ], 
+            required: true
+            }, 
+            {
+            prompt: "¿Cuántos baños completos con regadera y W.C. (excusado) hay en tu vivienda?", 
+            name: 'socio_bano', 
+            options: ['0', '1', '2 o más'], 
+            required: true
+            },
+            {
+            prompt: "¿Cuántos automóviles o camionetas tienen en su hogar, incluyendo camionetas cerradas, o con cabina o caja?", 
+            name: 'socio_autos', 
+            options: ['0', '1', '2 o más'], 
+            required: true
+            },
+            {
+            prompt: "Sin tomar en cuenta la conexión móvil que pudiera tener desde algún celular ¿este hogar cuenta con internet?", 
+            name: 'socio_int', 
+            options: ['No tiene', 'Sí tiene'], 
+            required: true
+            },
+            {
+            prompt: "De todas las personas de 14 años o más que viven en el hogar, ¿cuántas trabajaron en el último mes?", 
+            name: 'socio_work', 
+            options: ['0', '1', '2','3','4 o más'], 
+            required: true
+            },
+            {
+            prompt: "En esta vivienda, ¿cuántos cuartos se usan para dormir, sin contar pasillos ni baños?", 
+            name: 'socio_rooms', 
+            options: ['0', '1', '2','3','4 o más'], 
+            required: true
+            }
+        ],
+        button_label: "Continuar",
+        data:{stimulus:'ses'}
+    };
+
+    timeline.push(ses);
+
+    var demovar = {
+    type: jsPsychSurveyMultiChoice,
+    questions: [
+      {
+      prompt: "Estado civil", 
+      name: 'edocivil', 
+      options: ['Soltera/o', 'Casada/o', 'Divorciada/o', 'Unión libre','Viuda/o'], 
+      required: true
+      }, 
+      {
+      prompt: "¿Cuál es tu opinión general de los videojuegos?", 
+      name: 'opinVG', 
+      options: ['Son improductivos, una pérdida de tiempo.', 'No me interesan.', 'Un entretenimiento más de varios que tengo.', 'Mi fuente principal de entretenimiento.', 'Son una parte fundamental en mi vida.'], 
+      required: true
+      },   
+      {
+      prompt: "¿Qué tipo de videojugador te consideras? ", 
+      name: 'tipoVG', 
+      options: ['<strong>Jugador casual/ocio</strong> (ej. Me gusta jugar videojuegos, pero tengo otros intereses. Además, mi tiempo es algo limitado).', '<strong>Jugador social</strong>: (ej. Juego videojuegos únicamente cuando alguien me invita o cuando quiere pasar el tiempo con amigos en reuniones sociales)', '<strong>Jugador intermedio</strong> (ej. Juego diferentes géneros de videojuegos de manera entusiasta, sin embargo, no juego tantas horas o en altas dificultades como lo hacen los videojugadores apasionados. Disfruto los videojuegos, pero puede que no termine cada título que empiece).', '<strong>Jugador apasionado</strong> (ej. Paso una cantidad amplia de tiempo jugando videojuegos. Me gusta buscar las noticias más nuevas y actualizaciones en la industria de los videojuegos. Tengo una buena PC/Consola hecha especialmente para jugar. Me gusta ahorrar dinero para gastar en artículos de videojuegos).', '<strong>Jugador profesional</strong> (ej. Me gusta jugar videojuegos constantemente como un trabajo de tiempo completo, mi objetivo principal es participar en torneos oficiales para ganar reputación y dinero).'], 
+      required: true
+      },        
+    ],
+    };    
+
+    timeline.push(demovar);
+
+    var EresVG = {
+        type: jsPsychSurveyMultiChoice,
+        questions: [{
+            prompt: "¿Consideras que eres un videojugador/a? (Entendemos por videojugador/a a cualquier persona que juega algún tipo de videojuego, ya sea en consola, celular, computadora, y sin importar el tipo de juego, como, por ejemplo: FIFA, Call of Duty, Candy Crush, Minecraft, Fortnite, League of Legends, sudoku, juegos mentales, entre otros).", 
+            name: 'EresVG', 
+            options: ['Si', 'No'], 
+            required: true
+        }],
+        button_label: "Continuar",
+        data:{stimulus:"EresVG"}
+    }
+    
+    timeline.push(EresVG);
+
+    //videgamer description
+    var numero = {
+    type: jsPsychSurveyText,
+    preamble: 'Considerando sólo los últimos 6 meses, en una semana rutinaria ¿Aproximadamente cuántas horas a la semana sueles jugar cualquiera de los videojuegos mencionados? "Proporciona sólo dígitos" (ej. 4, 13, 20, 40)',
+    questions: [
+      {prompt: 'Número:', name: 'numero'}
+    ],
+    required: true,
+
+    data: {stimulus: "numero"}
+  };
+
+    timeline.push(numero);
+
+    var numero2 = {
+    type: jsPsychSurveyText,
+    preamble: '¿Por cuántos años has estado jugando videojuegos como un pasatiempo constante en tu vida?',
+    questions: [
+      {prompt: 'Número:', name: 'numero'}
+    ],
+    required: true
+    };
+  
+    timeline.push(numero2);
+
+    var juegosvar = {
+    type: jsPsychSurveyMultiChoice,
+    questions: [
+      {
+      prompt: "En promedio ¿Cuántos días juegas videojuegos a la semana? ", 
+      name: 'VGsemana', 
+      options: ['0 días', '1-2 días', '3-4 días', '5-6 días', '7 días'], 
+      required: true
+      }, 
+      {
+      prompt: "¿Cuál es el género de videojuegos que más practicaste en los últimos 6 meses? ", 
+      name: 'generoVG', 
+      options: ['Ninguno','Juegos mentales (tetris, sudoku, juegos de memoria, crucigramas y palabras)','Acción de disparos en primera persona (ej. Call of duty, Halo, Overwatch, etc.) ','Acción de disparos en tercera persona (ej. Fortnite, Gears of War, Free fire, etc.) ','Aventura (ej. God of War, Uncharted, The last of Us, Far cry, Yakuza, etc.)','Plataformas (ej. Super Mario Bros, Fallguys, Rayman, etc.) ','Puzzle-Rompecabezas (ej. Tetris, Bejeweled, Candy Crush, etc.)','Juego de Rol Tradicional por Turnos (ej. Persona, Final Fantasy, Pokémon, Honkai: Star rail, etc.)','Juego de Rol de Acción Aventura (ej. Demon Souls, Elden Ring, Skyrim, Monster Hunter, Diablo, etc.)','Acción - Hack n Slash (ej. Bayonetta, Devil My Cry, Hades, Darksiders, etc.) ','Deportes (FIFA, NBA 2k, Madden, MLB, UFC, etc.)','Simuladores de Manejo, Vuelo (ej. Gran Turismo, Forza, Microsoft Flying Simulator, etc.)','Juego de Rol Multijugador Masivo en Linea (ej. World of Warcraft, Lost Ark, Final Fantasy online, Black Desert, etc.)','Juego multijugador en linea de arena de batalla (ej. League of Legends, Pokemon Unite, Smite, Heroes of the Storm, Clash of clans, etc.)','Apunta y selecciona (ej. Grim Fandango, Monkey Island, Doki Doki series, Papers please, etc.) ','Peleas (ej. Street Fighter, Mortal Kombat, Smash Bros, Dragon ball fighterz, KoF, etc.)','Arcade de disparos con Naves o pistolas (ej. Cuphead, Metal Slug, Contra, etc.)','Arcade de circuito de Carreras (ej. Mario Kart, Need for Speed, Forza Horizon, Dirt, etc.) ','Sobrevivencia-Terror (ej. Dead by Daylight, Resident Evil, Dead Space, Silent Hill, Amnesia, etc.)','Mundo Abierto (ej. Zelda Tears of the Kingdom, Grand Theft Auto, Minecraft, Genshin impact, etc.) ','Juegos de cartas (ej. Magic, Yu-gi-Oh Master Duel, Solitario, Hearthstone, Marvel Snap, etc.)','Musica y Baile (ej. Dance Dance Revolution, Just Dance, Guitar Hero, Osu, etc.) ','Estrategia en tiempo real (ej. Warhammer, Age of Empires, Warcraft, Pikmin, etc.) ','Juegos de inteligencia (ej. Brain Age, Scrable Go, Brain Training, Lumosity, etc.)','Juegos de Realidad Aumentada (ej. Pokemon Go, Ingress, Zombies Run, Monster huntr now, etc.)'], 
+      required: true
+      },   
+      {
+      prompt: "¿Juegas videojuegos en línea?  ", 
+      name: 'VGenlinea', 
+      options: ['Nunca', 'Casi nunca', 'Algunas veces', 'Casi siempre', 'Siempre'], 
+      required: true
+      },     
+      {
+      prompt: "Del tiempo total a la semana que dedicas a jugar videojuegos, ¿cuál es la frecuencia en la que lo haces en el celular o tableta portátil con pantalla táctil?", 
+      name: 'VGcel', 
+      options: ['Nunca', 'Casi nunca', 'Algunas veces', 'Casi siempre', 'Siempre'], 
+      required: true
+      },     
+      {
+      prompt: "Del tiempo total a la semana que dedicas a jugar videojuegos, ¿cuál es la frecuencia en la que lo haces en una consola?", 
+      name: 'VFconsol', 
+      options: ['Nunca', 'Casi nunca', 'Algunas veces', 'Casi siempre', 'Siempre'], 
+      required: true
+      }, 
+      {
+      prompt: "Del tiempo total a la semana que dedicas a jugar videojuegos, ¿cuál es la frecuencia en la que lo haces en una computadora?", 
+      name: 'VGpc', 
+      options: ['Nunca', 'Casi nunca', 'Algunas veces', 'Casi siempre', 'Siempre'], 
+      required: true
+      }, 
+    ],
+    };    
+
+    timeline.push(juegosvar);
+
+    var Diasmasjuega = {
+        type: jsPsychSurveyMultiSelect,
+        questions: [
+        {
+          prompt: "En una semana rutinaria ¿Cuáles días usualmente son los que más juegas? Puedes marcar múltiples opciones.", 
+          options: ["Ninguno", "Todos los días (ej. Lunes a Domingo)", "Sólo entre semana (ej. Lunes a viernes)", "Sólo los fines de semana (ej. Sábado y Domingo)", "Días sin responsabilidades de trabajo/escuela"], 
+          horizontal: true,
+          required: true,
+         name: 'diasjuega'
+        }
+    ], 
+    randomize_question_order: true
+    };
+
+    timeline.push(Diasmasjuega);
+
+    var numero3 = {
+    type: jsPsychSurveyText,
+    preamble: 'Del día de la semana que más juegas, ¿cuántas horas lo haces? Utiliza sólo dígitos.',
+    questions: [
+      {prompt: 'horas:', name: 'numero'}
+    ],
+    required: true
+    };
+  
+    timeline.push(numero3);
+
+    var tresVG = {
+    type: jsPsychSurveyText,
+    preamble: '¿Cuáles son los 3 videojuegos que más has practicado en los últimos 6 meses?	* Escribe tu respuesta en orden donde 1 sea el que más tiempo invertiste y así sucesivamente (No necesariamente deben ser 3) ',
+    questions: [
+      {prompt: 'videojuegos:', name: 'nombres'}
+    ],
+    required: true
+    };
+  
+    timeline.push(tresVG);
+
+    //razones y motivaciones
+
+    var likert_scale_emotions = [
+        "Mucho menos que el promedio", 
+        "Menos que el promedio", 
+        "Poco menos que el promedio", 
+        "Igual que el promedio", 
+        "Poco más que el promedio",
+        "Más que el promedio",
+        "Mucho más que el promedio"
+    ];
+    
+    var reasons_motivation = {
+        type: jsPsychSurveyLikert,
+        preamble: '<strong>Razones y propósitos para jugar videojuegos</strong><br><strong>Indicaciones:</strong> <br> A continuación, encontrarás una serie de afirmaciones sobre tus razones y motivaciones con los videojuegos. Para cada afirmación, ¿Cómo te calificarías a ti mismo en comparación con otros adultos de tu edad en cada una de las afirmaciones que se enumeran a continuación? Por favor, elije la mejor puntuación basándose en su experiencia. <br> <strong>Ejemplo:</strong> Si la afirmación es "Juego videojuegos para socializar con amigos y/o conocer gente nueva" y el principal motivo para que tu jueges es socializar, podrías marcar "Más que el promedio" o "Mucho más que el promedio". ',
+        questions: [
+        {prompt: "Juego videojuegos para socializar con amigos y/o conocer gente nueva.", name: 'E_1', labels: likert_scale_emotions},
+        {prompt: "Cuando dispongo de tiempo libre, me inclino a jugar videojuegos.", name: 'E_2', labels: likert_scale_emotions},
+        {prompt: "Juego videojuegos porque requieren que me mantenga atento y responsivo.", name: 'E_3', labels: likert_scale_emotions},
+        {prompt: "Juego videojuegos, porque me generan una sensación placentera.", name: 'E_4', labels: likert_scale_emotions},
+        {prompt: "Juego videojuegos para cumplir objetivos y metas que me dan sensación de logro personal (ej. mejorar ranking, KD, trofeos, clasificación etc.)", name: 'E_5', labels: likert_scale_emotions},
+        {prompt: "Juego videojuegos para liberarme de algún malestar (ej. tristeza, enojo, estrés, ansiedad).", name: 'E_6', labels: likert_scale_emotions},
+        {prompt: "Práctico videojuegos porque me gusta competir con otros o conmigo mismo.", name: 'E_7', labels: likert_scale_emotions},
+        {prompt: "Juego videojuegos para ser parte de un equipo, dialogar, organizar estrategias y compartir la experiencia", name: 'E_8', labels: likert_scale_emotions},
+        {prompt: "Práctico videojuegos con el único objetivo de ganar, de lo contrario paso un mal rato.", name: 'E_9', labels: likert_scale_emotions},
+        {prompt: "Siento mucha frustración cuando yo, o un miembro de mi equipo comete un error que provoca que perdamos la partida de juego.", name: 'E_10', labels: likert_scale_emotions},
+        {prompt: "Práctico videojuegos con el objetivo de convertirme en profesional, ganar reputación y obtener beneficios monetarios.", name: 'E_11', labels: likert_scale_emotions},
+        {prompt: "Juego videojuegos por costumbre, aunque no me siento particularmente interesado.", name: 'E_12', labels: likert_scale_emotions},
+        {prompt: "A menudo me encuentro jugando videojuegos sin un motivo específico, simplemente por pasar el tiempo.", name: 'E_13', labels: likert_scale_emotions},
+        {prompt: "Juego videojuegos porque disfruto de los desafíos que me presentan.", name: 'E_14', labels: likert_scale_emotions},
+        {prompt: "Me siento emocionado al descubrir nuevas historias y mundos dentro de los videojuegos.", name: 'E_15', labels: likert_scale_emotions}
+        ],
+        required: true,
+        randomize_question_order: false,
+        button_label: "Continuar",
+        data:{stimulus:"reasons_motivation"}
+    };
+
+    timeline.push(reasons_motivation);
+
+    var problems_VG = {
+        type: jsPsychSurveyLikert,
+        preamble: '<strong>Práctica de videojuegos</strong><br><strong>Indicaciones:</strong> <br>A continuación, encontrarás una serie de afirmaciones sobre tus hábitos y comportamientos relacionados con los videojuegos. Para cada afirmación, ¿Cómo te calificarías a ti mismo en comparación con otros adultos de tu edad en cada una de las afirmaciones que se enumeran a continuación? Por favor, elije la mejor puntuación basándose en tu experiencia y comportamiento. <strong>Ejemplo:</strong> Si la afirmación es "Juego videojuegos por el tiempo que tenía planeado", pero tu tiendes a jugar mucho más tiempo de lo que inicialmente tenías planeado en comparación con adultos de tu misma edad, podrías marcar "Menos que el promedio" o "Mucho menos que el promedio". Ya que respetaste en menor medida tu planeación, en comparación con los adultos que tu conoces.',
+        questions: [
+        {prompt: "Juego videojuegos por el tiempo que tenía planeado para la sesión..", name: 'DFVG_1', labels: likert_scale_emotions},
+        {prompt: "Puedo terminar una sesión de juego en el momento que decido..", name: 'DFVG_2', labels: likert_scale_emotions},
+        {prompt: "Equilibro bien el tiempo de juego con mis responsabilidades de trabajo y/o escuela..", name: 'DFVG_3', labels: likert_scale_emotions},
+        {prompt: "Equilibro bien el tiempo jugando videojuegos y pasarla con mis amigos..", name: 'DFVG_4', labels: likert_scale_emotions},
+        {prompt: "Equilibrio bien pasar tiempo tanto jugando videojuegos como con mi familia..", name: 'DFVG_5', labels: likert_scale_emotions},
+        {prompt: "Socializo fácilmente con personas fuera de la virtualidad de un videojuego..", name: 'DFVG_6', labels: likert_scale_emotions},
+        {prompt: "Equilibro bien el tiempo de sueño con mis ganas de continuar jugando..", name: 'DFVG_7', labels: likert_scale_emotions},
+        {prompt: "Duermo la cantidad adecuada de horas, sin que el juego interfiera..", name: 'DFVG_8', labels: likert_scale_emotions},
+        {prompt: "Mi desempeño en la escuela/trabajo no se ve afectado por el tiempo que paso jugando videojuegos..", name: 'DFVG_9', labels: likert_scale_emotions},
+        {prompt: "Cumplo con mis deberes en el hogar y no me ausento del trabajo/escuela para poder jugar videojuegos..", name: 'DFVG_10', labels: likert_scale_emotions},
+        {prompt: "Las personas cercanas a mí no hacen comentarios sobre el tiempo que paso jugando videojuegos..", name: 'DFVG_11', labels: likert_scale_emotions},
+        {prompt: "Puedo participar en conversaciones sociales sin necesidad de hablar de videojuegos..", name: 'DFVG_12', labels: likert_scale_emotions},
+        {prompt: "Mantengo una relación sentimental saludable sin que mis hábitos de juego sean un problema..", name: 'DFVG_13', labels: likert_scale_emotions},
+        {prompt: "Encuentro interés en diversas actividades de entretenimiento, no solo en jugar videojuegos..", name: 'DFVG_14', labels: likert_scale_emotions}
+        ],
+        required: true,
+        randomize_question_order: false,
+        button_label: "Continuar",
+        data:{stimulus:"problems_VG"}
+    };
+
+    timeline.push(problems_VG);
+
+    var likert_scale_PGE = [
+        "Nunca", 
+        "Casi nunca", 
+        "Algunas veces", 
+        "Casi siempre", 
+        "Siempre"
+      ];
+     
+      var PG_exp = {
+        type: jsPsychSurveyLikert,
+        preamble: '<strong>Post-game experiences (transferencias de juego)</strong><br><strong>Indicaciones</strong><br> A continuación, encontrarás una serie de afirmaciones, por favor responde la frecuencia de los siguientes enunciados enfocándote en el último MES. <br><strong>Ejemplo:</strong> Si la afirmación es " He sentido sensaciones o movimientos táctiles involuntarios en mi cuerpo " y lo has sentido continuamente en el último mes, podrías marcar "casi siempre" o "siempre".',
+        questions: [
+        {prompt: "He escuchado en mi mente sonidos, voces, canciones asociadas a un videojuego. Ejemplo: La voz de un personaje, la tonada de una canción, los efectos de sonido de un videojuego, etc..", name: 'PGE_1', labels: likert_scale_PGE},
+        {prompt: "Cuando deseo concentrarme en una actividad, no puedo hacerlo porque los pensamientos sobre videojuegos siguen apareciendo en mi mente. Ejemplo: no poder escribir un ensayo por no poder dejar de pensar en mi última partida de juego.", name: 'PGE_2', labels: likert_scale_PGE},
+        {prompt: "He visualizado en mi mente imágenes o elementos asociados al videojuego. Ejemplo: Patrones de posible acomodo de un puzzle, imaginar cómo personalizar un personaje, mejorar mi estrategia etc..", name: 'PGE_3', labels: likert_scale_PGE},
+        {prompt: "He malinterpretado o confundido objetos del mundo real o escenarios con algún elemento o escena de un videojuego. Ejemplo: ver pasto alto y pensar que encontraré un Pokémon, caminar por un pasillo oscuro y pensar que una amenaza podría aparecer, etc..", name: 'PGE_4', labels: likert_scale_PGE},
+        {prompt: "He pensado o he querido utilizar elementos o una habilidad de un videojuego en la vida real. Ejemplo: pensar en hacer un viaje rápido, escalar, correr sin cansarme, curarme con un ítem, etc.", name: 'PGE_5', labels: likert_scale_PGE},
+        {prompt: "He sentido sensaciones o movimientos táctiles involuntarios en mi cuerpo. Ejemplo: sentir el mouse, teclado, control bajo mis manos..", name: 'PGE_6', labels: likert_scale_PGE},
+        {prompt: "He escuchado literalmente sonidos, voces o canciones asociadas al videojuego. Ejemplo: caminando a casa escuche la voz de un personaje de un videojuego..", name: 'PGE_7', labels: likert_scale_PGE},
+        {prompt: "He visto literalmente con mis ojos abiertos, elementos asociados al videojuego.", name: 'PGE_8', labels: likert_scale_PGE},
+        {prompt: "He tenido reflejos involuntarios en mis manos o piernas, he dicho una palabra, un diálogo del juego o actuado una escena de este de manera involuntaria. Ejemplo: Mover las manos para accionar un comando, hacer una seña como un personaje del videojuego, etc. Decir la palabra Avancen, Ataquen, etc a un grupo de amigos involuntariamente.", name: 'PGE_9', labels: likert_scale_PGE},
+        {prompt: "He visto literalmente, imágenes, personajes, escenarios del videojuego en el mundo real. Ejemplo: Ver un objeto-logo de un videojuego en el supermercado, la barra de comandos en la pared, un personaje en una multitud, etc..", name: 'PGE_10', labels: likert_scale_PGE},
+        {prompt: "He sentido la necesidad o urgencia de hacer algo en la vida real como normalmente lo haría en el videojuego. Ejemplo: camuflajearse entre la gente, trepar un edificio, golpear a alguien.", name: 'PGE_11', labels: likert_scale_PGE},
+        {prompt: "He utilizado constantemente de manera automática mecánicas de un videojuego en la vida real. Ejemplo: Analizar escenarios estratégicamente, escanear objetos, utilizar diálogos de un personaje, etc..", name: 'PGE_12', labels: likert_scale_PGE}
+       ],
+       required: true,
+        randomize_question_order: false,
+        button_label: "Continuar",
+        data:{stimulus:"PG_exp"}
+    };
+
+    timeline.push(PG_exp);
+
+    var likert_scale_DASS = [
+        "No me ha ocurrido", 
+        "Me ha ocurrido un poco", 
+        "Me ha ocurrido bastante", 
+        "Me ha ocurrido mucho"
+      ];
+    
+      var DASS = {
+        type: jsPsychSurveyLikert,
+        preamble: '<strong>Rasgos de personalidad</strong><br><strong>Indicaciones</strong><br>Por favor lea las siguientes afirmaciones y coloque un círculo alrededor de un número (0, 1, 2, 3) que indica en qué grado le ha ocurrido a usted esta afirmación durante la semana pasada. La escala de calificación es la siguiente: 0: No me ha ocurrido; 1: Me ha ocurrido un poco, o durante parte del tiempo; 2: Me ha ocurrido bastante, o durante una buena parte del tiempo; 3: Me ha ocurrido mucho, o la mayor parte del tiempo',
+        questions: [
+        {prompt: "Me ha costado mucho descargar la tensión.", name: 'DASS_1', labels: likert_scale_DASS},
+        {prompt: "Me di cuenta que tenía la boca seca.", name: 'DASS_2', labels: likert_scale_DASS},
+        {prompt: "No podía sentir ningún sentimiento positivo.", name: 'DASS_3', labels: likert_scale_DASS},
+        {prompt: "Se me hizo difícil respirar.", name: 'DASS_4', labels: likert_scale_DASS},
+        {prompt: "Se me hizo difícil tomar la iniciativa para hacer cosas.", name: 'DASS_5', labels: likert_scale_DASS},
+        {prompt: "Reaccioné exageradamente en ciertas situaciones.", name: 'DASS_6', labels: likert_scale_DASS},
+        {prompt: "Sentí que mis manos temblaban.", name: 'DASS_7', labels: likert_scale_DASS},
+        {prompt: "He sentido que estaba gastando una gran cantidad de energía.", name: 'DASS_8', labels: likert_scale_DASS},
+        {prompt: "Estaba preocupado por situaciones en las cuales podía tener pánico o en las que podría hacer el ridículo.", name: 'DASS_9', labels: likert_scale_DASS},
+        {prompt: "He sentido que no había nada que me ilusionara.", name: 'DASS_10', labels: likert_scale_DASS},
+        {prompt: "Me he sentido inquieto.", name: 'DASS_11', labels: likert_scale_DASS},
+        {prompt: "Se me hizo difícil relajarme.", name: 'DASS_12', labels: likert_scale_DASS},
+        {prompt: "Me sentí triste y deprimido.", name: 'DASS_13', labels: likert_scale_DASS},
+        {prompt: "No toleré nada que no me permitiera continuar con lo que estaba haciendo.", name: 'DASS_14', labels: likert_scale_DASS},
+        {prompt: "Sentí que estaba al punto de pánico.", name: 'DASS_15', labels: likert_scale_DASS},
+        {prompt: "No me pude entusiasmar por nada.", name: 'DASS_16', labels: likert_scale_DASS},
+        {prompt: "Sentí que valía muy poco como persona.", name: 'DASS_17', labels: likert_scale_DASS},
+        {prompt: "He tendido a sentirme enfadado con facilidad.", name: 'DASS_18', labels: likert_scale_DASS},
+        {prompt: "Sentí los latidos de mi corazón a pesar de no haber hecho ningún esfuerzo físico.", name: 'DASS_19', labels: likert_scale_DASS},
+        {prompt: "Tuve miedo sin razón.", name: 'DASS_20', labels: likert_scale_DASS},
+        {prompt: "Sentí que la vida no tenía ningún sentido.", name: 'DASS_21', labels: likert_scale_DASS},
+        ],
+        required: true,
+        randomize_question_order: false,
+        button_label: "Continuar",
+        data:{stimulus:"DASS"}
+    };
+
+    timeline.push(DASS);
+
+    var SWAN = {
+        type: jsPsychSurveyLikert,
+        preamble: '<strong>Características atencionales y conductuales</strong><br><strong>Indicaciones:</strong> <br>A continuación, encontrarás una serie de afirmaciones sobre tus hábitos y comportamientos del día a día. Para cada afirmación, ¿Cómo te calificarías a ti mismo en comparación con otros adultos de tu edad en cada una de las afirmaciones que se enumeran a continuación? Por favor, elije la mejor puntuación basándose en tu experiencia y comportamiento. <strong>Ejemplo:</strong> Si la afirmación es "Presto atención a los detalles y evito errores por descuido" y tiendes a cometer muchos más errores en comparación con adultos de tu misma edad, podrías marcar "Menos que el promedio" o "Mucho menos que el promedio".',
+        questions: [
+        {prompt: "Presto atención a los detalles y evito errores por descuido.", name: 'SWAN_1 ', labels: likert_scale_emotions},
+        {prompt: "Mantengo la atención en mis tareas y actividades.", name: 'SWAN_2 ', labels: likert_scale_emotions},
+        {prompt: "Pongo atención cuando me hablan directamente.", name: 'SWAN_3 ', labels: likert_scale_emotions},
+        {prompt: "Sigo instrucciones y termino mis tareas o responsabilidades.", name: 'SWAN_4 ', labels: likert_scale_emotions},
+        {prompt: "Organizo mis tareas y actividades.", name: 'SWAN_5 ', labels: likert_scale_emotions},
+        {prompt: "Soy dedicado/a con tareas que requieren concentración, pensar mucho o cuidadosamente (por ejemplo, hacer cuentas, hacer lecturas largas, seguir conversaciones largas).", name: 'SWAN_6 ', labels: likert_scale_emotions},
+        {prompt: "Mantengo en orden las cosas necesarias para mis actividades.", name: 'SWAN_7 ', labels: likert_scale_emotions},
+        {prompt: "Ignoro lo que es irrelevante para completar mis actividades.", name: 'SWAN_8 ', labels: likert_scale_emotions},
+        {prompt: "Recuerdo actividades que debo realizar a diario.", name: 'SWAN_9 ', labels: likert_scale_emotions},
+        {prompt: "Al estar sentado, me mantengo tranquilo (controlo los movimientos de mis manos o pies, o controlo retorcerme).", name: 'SWAN_10 ', labels: likert_scale_emotions},
+        {prompt: "Me mantengo sentado cuando es requerido en clase, el trabajo o eventos sociales.", name: 'SWAN_11 ', labels: likert_scale_emotions},
+        {prompt: "Controlo mis movimientos (por ejemplo, dejar de caminar de un lado a otro).", name: 'SWAN_12 ', labels: likert_scale_emotions},
+        {prompt: "Mantengo un nivel de ruido apropiado para la situación (por ejemplo, mi voz, azotar puertas, volumen de aparatos).", name: 'SWAN_13 ', labels: likert_scale_emotions},
+        {prompt: "Descanso cuando me lo propongo (puedo controlar mis actividades).", name: 'SWAN_14 ', labels: likert_scale_emotions},
+        {prompt: "Controlo mi actividad verbal (controlo hablar excesivamente).", name: 'SWAN_15 ', labels: likert_scale_emotions},
+        {prompt: "Reflexiono cuando me hacen preguntas (controlo contestar rápido).", name: 'SWAN_16 ', labels: likert_scale_emotions},
+        {prompt: "Espero mi turno pacientemente.", name: 'SWAN_17 ', labels: likert_scale_emotions},
+        {prompt: "Entro en conversaciones y actividades apropiadamente (sin interrumpir ni ser intrusivo).", name: 'SWAN_18 ', labels: likert_scale_emotions}
+        ],
+        required: true,
+        randomize_question_order: false,
+        button_label: "Continuar",
+        data:{stimulus:"SWAN"}
+    };
+
+    timeline.push(SWAN);
+
+    var likert_scale_MCH = [
+        "Nunca", 
+        "Una o dos veces", 
+        "Más o menos una vez por semana", 
+        "Dos o tres veces por semana",
+        "Casi todos los días",
+        "Todos los días"
+      ];
+
+    var MCH = {
+        type: jsPsychSurveyLikert,
+        preamble: '<strong>Satisfacción personal</strong><br><strong>Indicaciones:</strong><br> Responda a las siguientes preguntas sobre cómo se ha sentido durante el último mes. Marque la casilla que mejor represente la frecuencia con la que ha experimentado o sentido lo siguiente. <strong>Ejemplo:</strong> Si la afirmación es "Feliz" y tiendes a sentirte feliz frecuentemente, podrías marcar "Casi todos los días" o "Todos los días".<br> <strong>¿Cómo te has sentido durante el último mes?</strong></br>',
+        questions: [
+          {prompt: "Feliz.", name: 'MHC_1 ', labels: likert_scale_MCH},
+          {prompt: "Interesado(a) en la vida.", name: 'MHC_2 ', labels: likert_scale_MCH},
+          {prompt: "Satisfecho(a) con la vida.", name: 'MHC_3 ', labels: likert_scale_MCH},
+          {prompt: "Que has hecho algo importante para contribuir con la sociedad.", name: 'MHC_4 ', labels: likert_scale_MCH},
+          {prompt: "Que perteneces a una comunidad (como un grupo social, familia, amigos, escuela, trabajo u otro).", name: 'MHC_5 ', labels: likert_scale_MCH},
+          {prompt: "Que nuestra sociedad es un buen lugar para vivir.", name: 'MHC_6 ', labels: likert_scale_MCH},
+          {prompt: "Que las personas en general son buenas.", name: 'MHC_7 ', labels: likert_scale_MCH},
+          {prompt: "Que la forma en la que funciona nuestra sociedad tiene sentido para ti.", name: 'MHC_8 ', labels: likert_scale_MCH},
+          {prompt: "Que te gusta tu forma de ser.", name: 'MHC_9 ', labels: likert_scale_MCH},
+          {prompt: "Que eres capaz de cumplir con tus responsabilidades.", name: 'MHC_10 ', labels: likert_scale_MCH},
+          {prompt: "Que tienes relaciones cálidas y de confianza con otras personas.", name: 'MHC_11 ', labels: likert_scale_MCH},
+          {prompt: "Que has tenido experiencias que te motivan para crecer y ser mejor persona.", name: 'MHC_12 ', labels: likert_scale_MCH},
+          {prompt: "Seguro (a) de ti mismo (a) para expresar tus ideas y opiniones.", name: 'MHC_13 ', labels: likert_scale_MCH},
+          {prompt: "Que la vida tiene significado para ti.", name: 'MHC_14 ', labels: likert_scale_MCH}
+          
+        ],
+        required: true,
+        randomize_question_order: false,
+        button_label: "Continuar",
+        data:{stimulus:"MCH"}
+    };
+
+    timeline.push(MCH);
+
+    const save_data1 = {
+        type: jsPsychPipe,
+        action: "save",
+        experiment_id: "mFZyHqNtYTWQ",
+        filename: `${subject_id}_block4.csv`,
+        data_string: ()=>jsPsych.data.get().csv()
+    };
+
+    timeline.push(save_data1);
+
+    timeline.push({
+        type: jsPsychFullscreen,
+        fullscreen_mode: false
+    });
+
+    var end_exp = {
+        type: jsPsychHtmlButtonResponse,
+        stimulus: '<p style= "font-size:30px;"><strong>¡Muchas gracias por participar!</strong></p><p style= "font-size:20px;">Cualquier duda o aclaración puede comunicarse con el Dr. Salvador Trejo Garcia al correo electronico: strejo@uabc.edu.mx.</p>'+
+        '<strong><p> Puede cerrar el navegador una vez que haya enviado sus respuestas</p></strong>',
+        choices: ['Enviar respuestas'],
+        data:{stimulus:"Ending"}
+    }
+
+    timeline.push(end_exp);
+    
+    var preload = {
+        type: jsPsychPreload,
+        auto_preload: true
+    }
+
+    jsPsych.run(timeline); 
+  </script>
+</html>
